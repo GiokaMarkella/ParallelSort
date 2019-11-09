@@ -34,3 +34,38 @@ void store_vector(relation *rel, int start, vector* v){
 
   free(a);
 }
+
+void test_func(vector *v){
+  vector new_v = _mm256_set_epi64x(0,0,0,0);
+  int control = 82;
+  // new_v = _mm256_permute4x64_epi64 (*v, 82);
+  new_v = _mm256_permute4x64_epi64 (*v, SHUF_COPY);
+  printf("========\n");
+  print_vector(v);
+  printf("========\n");
+
+  print_vector(&new_v);
+  printf("========\n");
+
+}
+
+void test2_func(vector *v1, vector *v2){
+  vector tmp = _mm256_set_epi64x(0,0,0,0);
+  vector tmp2 = _mm256_set_epi64x(0,0,0,0);
+
+  tmp = _mm256_permute2x128_si256 (*v2, *v1, 19);
+  // tmp = _mm256_permute4x64_epi64 (*v1, 224);
+
+  tmp2 = _mm256_permute2x128_si256 (*v2, *v1, 2);
+
+  printf("========\n");
+  print_vector(v1);
+  printf("========\n");
+  print_vector(v2);
+  printf("========\n");
+
+  print_vector(&tmp);
+  printf("========\n");
+  print_vector(&tmp2);
+  printf("========\n");
+}
