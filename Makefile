@@ -2,11 +2,11 @@
 # In order to execute this "Makefile" just type "make"
 #
 
-OBJS 	= main.o tuple.o relation.o
-T_OBJS 	= tuple.o relation.o
+OBJS 	= main.o relation.o vector.o merge_sort.o
+T_OBJS 	= relation.o
 
-SOURCE	= tuple.c relation.c
-HEADER  = ./include/tuple.h ./include/relation.h
+SOURCE	=  relation.c merge_sort.c vector.c
+HEADER  =  ./include/relation.h ./include/vector.h ./include/merge_sort.h
 
 OUT  	= main.exe
 
@@ -35,14 +35,21 @@ test.o: test.c
 main.o: main.c
 	$(CC) $(FLAGS) main.c
 
-tuple.o: tuple.c
-	$(CC) $(FLAGS) tuple.c
+vector.o: vector.c
+	$(CC) $(FLAGS) vector.c
 
-
+merge_sort.o: merge_sort.c
+	$(CC) $(FLAGS) merge_sort.c
 # run:
 # 	valgrind --leak-check=full --show-leak-kinds=all ./main.exe
 run:
 	./main.exe
+
+
+r:
+	valgrind --leak-check=full --show-leak-kinds=all ./main.exe -r ./Datasets/tiny/relA
+
+
 
 
 clean:

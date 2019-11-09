@@ -32,7 +32,7 @@ typedef struct relation{
 */
 // void relation_init(relation* myrel, char* filename, int rel_num, int norm_bool);
 
-void relation_init_data(relation* myrel, char* filename, int rel_num, int norm_bool);
+void relation_init_data(relation* myrel, char* filename, int rel_num);
 
 void relation_print(relation* myrel);
 
