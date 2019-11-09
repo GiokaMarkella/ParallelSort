@@ -8,9 +8,9 @@
 #include <stdint.h>
 #include <time.h>
 
+#include <immintrin.h>
+
 #include "./include/relation.h"
-#include "./include/resultsList.h"
-#include "./include/sort_merge_join.h"
 
 #define ARGS_NUM 9
 #define WRONG_ARGS -1
@@ -115,34 +115,75 @@ int read_arguments(relation *r1, relation *r2, int argc , char *argv []){
 
 int main(int argc , char *argv []) {
 
-    // Initialize relations in appropriate forms
-    relation r1, r2;
-    int ret_val = read_arguments(&r1, &r2, argc , argv);
-    if(ret_val==WRONG_ARGS){
-      printf("Wrong arguments given!\n");
-      return 1;
-    }
-
-    time_t start, finish;
-    printf("start!\n");
-    struct timespec vartime = timer_start();
-
-    // Call main method
-    resultsList * result= SortMergeJoin(&r1, &r2);
-    double time_elapsed_nanos = timer_end(vartime);
-    printf("Time taken: %lf\n", time_elapsed_nanos/(long)1e9);
-    // TODO copy result in csv file
-    char *fileName = malloc(strlen("Results") + 5);
-    strcpy(fileName, "Results");
-    createCSVFile(result, fileName);
-
-    free(fileName);
+    int64_t* a = malloc(sizeof(int64_t)*4);
+    int64_t* b = malloc(sizeof(int64_t)*4);
+    int64_t* c = malloc(sizeof(int64_t)*4);
+    // int64_t* max = malloc(sizeof(int64_t)*4);
 
 
+    //avx + avx2 min max that at least works
+    //-------------------------------------------------------------------------------------
+    __m256i t = _mm256_set_epi64x(6944444444444444481, 7833333333333333352, 7833333333333333353, 6944444444444444484);
+    __m256i t2 = _mm256_set_epi64x(7833333333333333351, 6944444444444444482, 6944444444444444483, 7833333333333333354);
 
-    // CLEANUP
-    listDestroy(result);
-    relation_destroy(&r1);
-    relation_destroy(&r2);
+    __m256i gr = _mm256_cmpgt_epi64 (t2, t);
+    //
+    // __m256i mask_1 = _mm256_and_si256(gr, t2);
+    // __m256i mask_2 = _mm256_andnot_si256(gr, t);
+    //
+    // __m256i mask_3 = _mm256_andnot_si256(gr, t2);
+    // __m256i mask_4 = _mm256_and_si256(gr, t);
+    //
+    // _mm256_storeu_si256( (__m256i *)&c[0], gr);
+    //
+    // __m256i max = _mm256_xor_si256(mask_1, mask_2);
+    // __m256i min = _mm256_xor_si256(mask_3, mask_4);
+    //
+    //
+    // _mm256_storeu_si256( (__m256i *)&a[0], max);
+    // _mm256_storeu_si256( (__m256i *)&b[0], min);
+
+    __m256i minv = _mm256_blendv_epi8(t, t2, gr);
+    __m256i maxv = _mm256_blendv_epi8(t2, t, gr);
+
+    _mm256_storeu_si256( (__m256i *)&a[0], maxv);
+    _mm256_storeu_si256( (__m256i *)&b[0], minv);
+
+    // printf("my int sizes are %lu,%lu,%lu,%lu, %ld\n",c[0],c[1],c[2],c[3], sizeof(__m512i));
+    //
+    printf("my ints are %lu,%lu,%lu,%lu, %ld\n",a[0],a[1],a[2],a[3], sizeof(__m512i));
+    printf("my ints are %lu,%lu,%lu,%lu, %ld\n",b[0],b[1],b[2],b[3], sizeof(__m512i));
+    // //-------------------------------------------------------------------------------------
+
+
+    // // Initialize relations in appropriate forms
+    // relation r1, r2;
+    // int ret_val = read_arguments(&r1, &r2, argc , argv);
+    // if(ret_val==WRONG_ARGS){
+    //   printf("Wrong arguments given!\n");
+    //   return 1;
+    // }
+    //
+    // time_t start, finish;
+    // printf("start!\n");
+    // struct timespec vartime = timer_start();
+    //
+    // // Call main method
+    // resultsList * result= SortMergeJoin(&r1, &r2);
+    // double time_elapsed_nanos = timer_end(vartime);
+    // printf("Time taken: %lf\n", time_elapsed_nanos/(long)1e9);
+    // // TODO copy result in csv file
+    // char *fileName = malloc(strlen("Results") + 5);
+    // strcpy(fileName, "Results");
+    // createCSVFile(result, fileName);
+    //
+    // free(fileName);
+    //
+    //
+    //
+    // // CLEANUP
+    // listDestroy(result);
+    // relation_destroy(&r1);
+    // relation_destroy(&r2);
 
 }
