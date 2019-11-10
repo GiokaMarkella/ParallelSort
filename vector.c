@@ -10,6 +10,10 @@ void set_vector(vector* v, int64_t* mem_addr){
   *v = _mm256_set_epi64x(*mem_addr,*(mem_addr+4),*(mem_addr+8),*(mem_addr+12));
 }
 
+void load_vector_consecutive(vector* v, int64_t* mem_addr){
+  *v = _mm256_set_epi64x(*mem_addr,*(mem_addr+1),*(mem_addr+2),*(mem_addr+3));
+}
+
 
 void min_max_compare_vectors(vector v1, vector v2, vector* minv, vector* maxv){
   vector gr = _mm256_cmpgt_epi64 (v1, v2);
@@ -35,72 +39,81 @@ void store_vector(relation *rel, int start, vector* v){
   free(a);
 }
 
-void test_func(vector *v){
-  vector new_v = _mm256_set_epi64x(0,0,0,0);
-  int control = 82;
-  // new_v = _mm256_permute4x64_epi64 (*v, 82);
-  new_v = _mm256_permute4x64_epi64 (*v, SHUF_COPY);
-  printf("========\n");
-  print_vector(v);
-  printf("========\n");
-
-  print_vector(&new_v);
-  printf("========\n");
-
+/*
+* returns the shuffled mirror of vector v
+*
+* v: a1,a2,a3,a4 => new_v: a4,a3,a2,a1
+*/
+vector mirror_vector(vector *v){
+  vector new_v;
+  new_v = _mm256_permute4x64_epi64 (*v, SHUF_MIRROR);
+  return new_v;
 }
 
-void test2_func(vector *v1, vector *v2){
-  vector tmp = _mm256_set_epi64x(0,0,0,0);
-  vector tmp2 = _mm256_set_epi64x(0,0,0,0);
-
+/*
+* switches lower half of v1 vector
+* with the higher half of v2 vector
+*
+* v1: a1,a2,(a3,a4)     a1,a2,b1,b2
+*          /         =>
+* v2: (b1,b2),b3,b4     a3,a4,b3,b4
+*/
+void permutate_half_vector(vector *v1, vector *v2){
+  // vector tmp = _mm256_set_epi64x(0,0,0,0);
+  // vector tmp2 = _mm256_set_epi64x(0,0,0,0);
+  vector tmp;
+  vector tmp2;;
   tmp = _mm256_permute2x128_si256 (*v2, *v1, 19); //->1,3
-  // tmp = _mm256_permute4x64_epi64 (*v1, 224);
-
   tmp2 = _mm256_permute2x128_si256 (*v2, *v1, 2); //->0,2
-
-  printf("========\n");
-  print_vector(v1);
-  printf("========\n");
-  print_vector(v2);
-  printf("========\n");
-
-  print_vector(&tmp);
-  printf("========\n");
-  print_vector(&tmp2);
-  printf("========\n");
+  *v2 = tmp;
+  *v1 = tmp2;
 }
 
-void test3_func(vector *v1, vector *v2){
-  vector tmp = _mm256_set_epi64x(0,0,0,0);
-  vector tmp2 = _mm256_set_epi64x(0,0,0,0);
-  vector tmp3 = _mm256_set_epi64x(0,0,0,0);
-  vector tmp4 = _mm256_set_epi64x(0,0,0,0);
+/*
+* switches elements from v1 and v2 like this:
+*
+* v1: a1,(a2),a3,(a4)     a1,b1,a3,b3
+*        /       /     =>
+* v2: (b1),b2,(b3),b4     a2,b2,a4,b4
+*/
+void permutate_quarter_vector(vector *v1, vector *v2){
+  vector tmp3;
+  vector tmp4;
 
-  vector tmp5 = _mm256_set_epi64x(0,0,0,0);
-  vector tmp6 = _mm256_set_epi64x(0,0,0,0);
+  permutate_half_vector(v1,v2);
+  tmp3 = _mm256_permute4x64_epi64 (*v2, 141); //shuffle elements
+  tmp4 = _mm256_permute4x64_epi64 (*v1, 141); //shuffle elements
 
+  //previous --
+  // tmp = _mm256_permute2x128_si256 (*v2, *v1, 19);
+  // tmp3 = _mm256_permute4x64_epi64 (tmp, 141); //shuffle elements
+  //
+  // tmp2 = _mm256_permute2x128_si256 (*v2, *v1, 2);
+  // tmp4 = _mm256_permute4x64_epi64 (tmp2, 141); //shuffle elements
+  permutate_half_vector(&tmp4,&tmp3);
+  *v1=tmp3;
+  *v2=tmp4;
+  // *v1=tmp5;
+  // *v2=tmp6;
 
+}
 
-  tmp = _mm256_permute2x128_si256 (*v2, *v1, 19);
-  tmp3 = _mm256_permute4x64_epi64 (tmp, 114); //shuffle elements
-  // tmp = _mm256_permute4x64_epi64 (*v1, 224);
+/*
+* switches elements from v1 and v2 like:
+*
+* v1: a1,a2,a3,a4     a1,b1,a2,b2
+*                  =>
+* v2: b1,b2,b3,b4     a3,b3,a4,b4
+*/
+void permutate_quarter_vector2(vector *v1, vector *v2){
+  vector tmp3;
+  vector tmp4;
 
-  tmp2 = _mm256_permute2x128_si256 (*v2, *v1, 2);
-  tmp4 = _mm256_permute4x64_epi64 (tmp2, 141); //shuffle elements
+  permutate_half_vector(v1,v2);
+  tmp3 = _mm256_permute4x64_epi64 (*v2, 216); //shuffle elements
 
+  tmp4 = _mm256_permute4x64_epi64 (*v1, 216); //shuffle elements
 
-  tmp5 = _mm256_permute2x128_si256 (tmp3, tmp4, 19); //->1,3
-  // tmp = _mm256_permute4x64_epi64 (*v1, 224);
-  tmp6 = _mm256_permute2x128_si256 (tmp3, tmp4, 2); //->0,2
-
-  printf("========\n");
-  print_vector(v1);
-  printf("========\n");
-  print_vector(v2);
-  printf("========\n");
-
-  print_vector(&tmp5);
-  printf("========\n");
-  print_vector(&tmp6);
-  printf("========\n");
+  *v1=tmp4;
+  *v2=tmp3;
 }

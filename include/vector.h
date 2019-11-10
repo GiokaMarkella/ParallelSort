@@ -20,15 +20,19 @@ typedef __m256i vector;
 
 void set_vector(vector* v, int64_t* mem_addr);
 
+void load_vector_consecutive(vector* v, int64_t* mem_addr);
+
 void min_max_compare_vectors(vector v1, vector v2, vector* minv, vector* maxv);
 
 void print_vector(vector *v);
 
 void store_vector(relation *rel, int start, vector* v);
 
-void test_func(vector *v);
+vector mirror_vector(vector *v);
 
-void test2_func(vector *v1, vector *v2);
+void permutate_half_vector(vector *v1, vector *v2);
 
-void test3_func(vector *v1, vector *v2);
+void permutate_quarter_vector(vector *v1, vector *v2);
+
+void permutate_quarter_vector2(vector *v1, vector *v2);
 #endif

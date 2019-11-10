@@ -35,9 +35,10 @@ void merge_sort(relation *rel, int start, int end){
     store_vector(rel, start+2, &y);
     store_vector(rel, start+3, &z);
 
-    // test_func(&w);
-    // test2_func(&w,&x);
-    test3_func(&w,&x);
+    //bitonic test
+    load_vector_consecutive(&a, &rel->values[start]);
+    load_vector_consecutive(&b, &rel->values[start+4]);
+    bitonic_sort(&a,&b);
 
     for(int i=0; i<4*4; i+=4){
       printf("group %d:\n",i);
@@ -47,4 +48,32 @@ void merge_sort(relation *rel, int start, int end){
     }
 
   }
+}
+
+void bitonic_sort(vector *v1, vector *v2){
+  // printf("==========\n");
+  // print_vector(v1);
+  // printf("==========\n");
+  // print_vector(v2);
+  *v1 = mirror_vector(v1);
+
+  vector min,max;
+
+  min_max_compare_vectors(*v1,*v2,&min,&max);
+  *v1 = min;
+  *v2 = max;
+
+  permutate_half_vector(v1, v2);
+
+  min_max_compare_vectors(*v1,*v2,&min,&max);
+  *v1 = min;
+  *v2 = max;
+
+  permutate_quarter_vector(v1, v2);
+
+  min_max_compare_vectors(*v1,*v2,&min,&max);
+  *v1 = min;
+  *v2 = max;
+
+  permutate_quarter_vector2(v1,v2);
 }
