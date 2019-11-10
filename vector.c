@@ -5,13 +5,20 @@ Purpose				           	:
 **************************************************************************/
 #include "./include/vector.h"
 
-
+/*
+* loads a 4xint64_t vector by taking every 4th
+* element from the given memory address
+*/
 void set_vector(vector* v, int64_t* mem_addr){
   *v = _mm256_set_epi64x(*mem_addr,*(mem_addr+4),*(mem_addr+8),*(mem_addr+12));
 }
 
+/*
+* loads a 4xint64_t vector from consecutive memory locations
+*/
 void load_vector_consecutive(vector* v, int64_t* mem_addr){
-  *v = _mm256_set_epi64x(*mem_addr,*(mem_addr+1),*(mem_addr+2),*(mem_addr+3));
+  // *v = _mm256_set_epi64x(*mem_addr,*(mem_addr+1),*(mem_addr+2),*(mem_addr+3));
+  *v = _mm256_set_epi64x(*(mem_addr+3),*(mem_addr+2),*(mem_addr+1),*(mem_addr));
 }
 
 
@@ -40,16 +47,7 @@ void store_vector(relation *rel, int start, vector* v){
 }
 
 void store_vector_consecutive(int64_t* mem_addr, vector* v){
-  // int64_t* a = malloc(sizeof(int64_t)*4); //TODO shuffle??
-  // _mm256_storeu_si256( (vector *)&a[0], *v);
   _mm256_storeu_si256( (vector *)&mem_addr[0], *v);
-  //
-  // rel->values[start] = a[3];
-  // rel->values[start+4] = a[2];
-  // rel->values[start+8] = a[1];
-  // rel->values[start+12] = a[0];
-
-  // free(a);
 }
 
 /*

@@ -61,6 +61,6 @@ int main(int argc , char *argv []) {
     int ret_val = read_arguments(&r, argc , argv);
 
     merge_sort(&r, 0, r.num_values);
-
+    relation_print(&r);
     relation_destroy(&r);
 }
