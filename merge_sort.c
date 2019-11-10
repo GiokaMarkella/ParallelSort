@@ -38,6 +38,9 @@ void merge_sort(relation *rel, int start, int end){
     //bitonic test
     load_vector_consecutive(&a, &rel->values[start]);
     load_vector_consecutive(&b, &rel->values[start+4]);
+    load_vector_consecutive(&c, &rel->values[start+8]);
+    load_vector_consecutive(&d, &rel->values[start+12]);
+
     bitonic_sort(&a,&b);
 
     for(int i=0; i<4*4; i+=4){
@@ -50,7 +53,7 @@ void merge_sort(relation *rel, int start, int end){
   }
 }
 
-void bitonic_sort(vector *v1, vector *v2){
+void bitonic_merge_network(vector *v1, vector *v2){
   // printf("==========\n");
   // print_vector(v1);
   // printf("==========\n");
