@@ -28,6 +28,8 @@ void print_vector(vector *v);
 
 void store_vector(relation *rel, int start, vector* v);
 
+void store_vector_consecutive(int64_t* mem_addr, vector* v);
+
 vector mirror_vector(vector *v);
 
 void permutate_half_vector(vector *v1, vector *v2);

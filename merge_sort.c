@@ -36,12 +36,15 @@ void merge_sort(relation *rel, int start, int end){
     store_vector(rel, start+3, &z);
 
     //bitonic test
-    load_vector_consecutive(&a, &rel->values[start]);
-    load_vector_consecutive(&b, &rel->values[start+4]);
-    load_vector_consecutive(&c, &rel->values[start+8]);
-    load_vector_consecutive(&d, &rel->values[start+12]);
+    // load_vector_consecutive(&a, &rel->values[start]);
+    // load_vector_consecutive(&b, &rel->values[start+4]);
+    // load_vector_consecutive(&c, &rel->values[start+8]);
+    // load_vector_consecutive(&d, &rel->values[start+12]);
 
-    bitonic_sort(&a,&b);
+    // bitonic_sort(&a,&b);
+    merge(rel, start, start+4, start+4, start+8);
+    merge(rel, start+8, start+12, start+12, start+16);
+    merge(rel, start, start+8, start+8, start+16);
 
     for(int i=0; i<4*4; i+=4){
       printf("group %d:\n",i);
@@ -51,6 +54,96 @@ void merge_sort(relation *rel, int start, int end){
     }
 
   }
+}
+
+void merge(relation *rel, int start1, int end1, int start2, int end2){
+  vector a;
+  vector b;
+  int64_t head1, head2;
+  int start = start1;
+  //output buffer
+  int64_t* output = malloc(sizeof(int64_t)*(end2-start1));
+  int64_t output_index = 0;
+
+  //fetch 4
+  load_vector_consecutive(&a, &rel->values[start1]);
+  start1 +=4;
+  if(start1<end1) head1 = rel->values[start1];
+
+  //fetch 4
+  load_vector_consecutive(&b, &rel->values[start2]);
+  start2 += 4;
+  if(start2<end2) head2 = rel->values[start2];
+
+
+  int break_flag=0;
+  //e.g. start = 0, end = 4 => start < end
+  do{
+
+    bitonic_merge_network(&a,&b); //merge
+
+    store_vector_consecutive(output+output_index, &a); //emit smaller
+    output_index += 4; //move output index
+
+    //pick next group of 4
+    if(start1<end1 && start2<end2){
+
+      if(head1 < head2){
+        load_vector_consecutive(&a, &rel->values[start1]);
+        start1 +=4;
+        if(!start1<end1){
+          break_flag=1;
+          break;
+        }
+        head1 = rel->values[start1];
+      }
+      else{
+        load_vector_consecutive(&a, &rel->values[start2]);
+        start2 +=4;
+        if(!start2<end2){
+          break_flag=1;
+          break;
+        }
+        head2 = rel->values[start2];
+      }
+
+    }
+    else{
+      store_vector_consecutive(output+output_index, &b); //emit b
+      output_index += 4; //move output index
+    }
+  }while(start1<end1 && start2<end2);
+
+
+  if(break_flag){
+    bitonic_merge_network(&a,&b); //merge
+    store_vector_consecutive(&output[output_index], &a); //emit a
+    output_index += 4; //move output index
+    store_vector_consecutive(&output[output_index], &b); //emit b
+    output_index += 4; //move output index
+
+    if(!start1<end1){ //eof1 -> emit in2
+      for(int i=start2; i<end2; i++){
+        output[output_index] = rel->values[i];
+        output_index++;
+      }
+    }
+    else{ //eof2 -> emit in1
+      for(int i=start1; i<end1; i++){
+        output[output_index] = rel->values[i];
+        output_index++;
+      }
+    }
+  }
+
+
+  for(int i=0; i<end2-start; i++){
+    rel->values[start+i] = output[i];
+  }
+  // for(int i=0; i<output_index; i++){
+  //   printf("%d: %lu \n",i,output[i]);
+  // }
+  free(output);
 }
 
 void bitonic_merge_network(vector *v1, vector *v2){

@@ -39,6 +39,19 @@ void store_vector(relation *rel, int start, vector* v){
   free(a);
 }
 
+void store_vector_consecutive(int64_t* mem_addr, vector* v){
+  // int64_t* a = malloc(sizeof(int64_t)*4); //TODO shuffle??
+  // _mm256_storeu_si256( (vector *)&a[0], *v);
+  _mm256_storeu_si256( (vector *)&mem_addr[0], *v);
+  //
+  // rel->values[start] = a[3];
+  // rel->values[start+4] = a[2];
+  // rel->values[start+8] = a[1];
+  // rel->values[start+12] = a[0];
+
+  // free(a);
+}
+
 /*
 * returns the shuffled mirror of vector v
 *

@@ -38,6 +38,9 @@ main.o: main.c
 vector.o: vector.c
 	$(CC) $(FLAGS) vector.c
 
+relation.o: relation.c
+	$(CC) $(FLAGS) relation.c
+
 merge_sort.o: merge_sort.c
 	$(CC) $(FLAGS) merge_sort.c
 # run:

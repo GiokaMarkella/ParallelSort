@@ -15,5 +15,7 @@ Purpose			    		:
 
 void merge_sort(relation *rel, int start, int end);
 
+void merge(relation *rel, int start1, int end1, int start2, int end2);
+
 void bitonic_merge_network(vector *v1, vector *v2);
 #endif
