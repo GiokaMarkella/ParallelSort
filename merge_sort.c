@@ -36,7 +36,9 @@ void merge_sort(relation *rel, int start, int end){
     store_vector(rel, start+3, &z);
 
     // test_func(&w);
-    test2_func(&w,&x);
+    // test2_func(&w,&x);
+    test3_func(&w,&x);
+
     for(int i=0; i<4*4; i+=4){
       printf("group %d:\n",i);
       for(int j=i; j<i+4; j++){

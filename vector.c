@@ -53,10 +53,10 @@ void test2_func(vector *v1, vector *v2){
   vector tmp = _mm256_set_epi64x(0,0,0,0);
   vector tmp2 = _mm256_set_epi64x(0,0,0,0);
 
-  tmp = _mm256_permute2x128_si256 (*v2, *v1, 19);
+  tmp = _mm256_permute2x128_si256 (*v2, *v1, 19); //->1,3
   // tmp = _mm256_permute4x64_epi64 (*v1, 224);
 
-  tmp2 = _mm256_permute2x128_si256 (*v2, *v1, 2);
+  tmp2 = _mm256_permute2x128_si256 (*v2, *v1, 2); //->0,2
 
   printf("========\n");
   print_vector(v1);
@@ -67,5 +67,40 @@ void test2_func(vector *v1, vector *v2){
   print_vector(&tmp);
   printf("========\n");
   print_vector(&tmp2);
+  printf("========\n");
+}
+
+void test3_func(vector *v1, vector *v2){
+  vector tmp = _mm256_set_epi64x(0,0,0,0);
+  vector tmp2 = _mm256_set_epi64x(0,0,0,0);
+  vector tmp3 = _mm256_set_epi64x(0,0,0,0);
+  vector tmp4 = _mm256_set_epi64x(0,0,0,0);
+
+  vector tmp5 = _mm256_set_epi64x(0,0,0,0);
+  vector tmp6 = _mm256_set_epi64x(0,0,0,0);
+
+
+
+  tmp = _mm256_permute2x128_si256 (*v2, *v1, 19);
+  tmp3 = _mm256_permute4x64_epi64 (tmp, 114); //shuffle elements
+  // tmp = _mm256_permute4x64_epi64 (*v1, 224);
+
+  tmp2 = _mm256_permute2x128_si256 (*v2, *v1, 2);
+  tmp4 = _mm256_permute4x64_epi64 (tmp2, 141); //shuffle elements
+
+
+  tmp5 = _mm256_permute2x128_si256 (tmp3, tmp4, 19); //->1,3
+  // tmp = _mm256_permute4x64_epi64 (*v1, 224);
+  tmp6 = _mm256_permute2x128_si256 (tmp3, tmp4, 2); //->0,2
+
+  printf("========\n");
+  print_vector(v1);
+  printf("========\n");
+  print_vector(v2);
+  printf("========\n");
+
+  print_vector(&tmp5);
+  printf("========\n");
+  print_vector(&tmp6);
   printf("========\n");
 }

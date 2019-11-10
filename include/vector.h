@@ -29,4 +29,6 @@ void store_vector(relation *rel, int start, vector* v);
 void test_func(vector *v);
 
 void test2_func(vector *v1, vector *v2);
+
+void test3_func(vector *v1, vector *v2);
 #endif
