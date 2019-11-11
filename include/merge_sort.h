@@ -15,6 +15,8 @@ Purpose			    		:
 
 void merge_sort(relation *rel, int64_t start, int64_t end);
 
+void sort_tail(relation *rel, int64_t start, int64_t end);
+
 void merge_sort_internal(relation *rel, int64_t start, int64_t end);
 
 void sorting_network(vector *a, vector *b, vector *c, vector *d, vector *w, vector *x, vector *y, vector *z);

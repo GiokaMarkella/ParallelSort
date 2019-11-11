@@ -13,6 +13,40 @@ void set_vector(vector* v, int64_t* mem_addr){
   *v = _mm256_set_epi64x(*mem_addr,*(mem_addr+4),*(mem_addr+8),*(mem_addr+12));
 }
 
+void set_vector_incomplete(vector* v, int64_t* mem_addr, int number_of_elements){
+  int64_t sp1, sp2, sp3, sp4;
+
+  switch (number_of_elements) {
+    case 0: /*prefferably it shouldnt go here*/
+      sp1 = 0;
+      sp2 = 0;
+      sp3 = 0;
+      sp4 = 0;
+      break;
+    case 1:
+      sp1 = *mem_addr;
+      sp2 = 0;
+      sp3 = 0;
+      sp4 = 0;
+      break;
+    case 2:
+      sp1 = *mem_addr;
+      sp2 = *(mem_addr+4);
+      sp3 = 0;
+      sp4 = 0;
+      break;
+    case 3:
+      sp1 = *mem_addr;
+      sp2 = *(mem_addr+4);
+      sp3 = *(mem_addr+8);
+      sp4 = 0;
+      break;
+    default:
+      break;
+  }
+  *v = _mm256_set_epi64x(sp1,sp2,sp3,sp4);
+}
+
 /*
 * loads a 4xint64_t vector from consecutive memory locations
 */
@@ -42,6 +76,37 @@ void store_vector(relation *rel, int start, vector* v){
   rel->values[start+4] = a[2];
   rel->values[start+8] = a[1];
   rel->values[start+12] = a[0];
+
+  free(a);
+}
+
+void store_vector_incomplete(relation *rel, int start, vector* v, int number_of_elements){
+  int64_t* a = malloc(sizeof(int64_t)*4); //TODO shuffle??
+  _mm256_storeu_si256( (vector *)&a[0], *v);
+  switch (number_of_elements) {
+    case 0:
+      break;
+    case 1:
+      rel->values[start] = a[3];
+      break;
+    case 2:
+      rel->values[start] = a[3];
+      rel->values[start+4] = a[2];
+      break;
+    case 3:
+      rel->values[start] = a[3];
+      rel->values[start+4] = a[2];
+      rel->values[start+8] = a[1];
+      break;
+    case 4:
+      rel->values[start] = a[3];
+      rel->values[start+4] = a[2];
+      rel->values[start+8] = a[1];
+      rel->values[start+12] = a[0];
+      break;
+    default:
+      break;
+  }
 
   free(a);
 }

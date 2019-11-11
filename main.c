@@ -59,8 +59,13 @@ int main(int argc , char *argv []) {
 
     relation r;
     int ret_val = read_arguments(&r, argc , argv);
-
+    // relation_print(&r);
+    struct timespec mytime = timer_start();
+    struct timespec vartime = timer_start();
     merge_sort(&r, 0, r.num_values);
+    double time_elapsed_nanos = timer_end(vartime);
+    printf("Time taken: %lf\n", time_elapsed_nanos/(long)1e9);
+
     // relation_print(&r);
     relation_destroy(&r);
 }

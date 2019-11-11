@@ -18,9 +18,15 @@ void relation_init_data(relation* myrel, char* filename, int rel_num){
     fscanf(file,"%lu,%lu\n",&rows,&collumns);
     printf("rows: %lu, collumns: %lu\n",rows,collumns);
 
-    // myrel->num_values = rows;                              //set number of tuples
+    // myrel->num_values = rows-8;                              //set number of tuples
     // myrel->num_values = 32;
-    myrel->num_values = 66;
+    myrel->num_values = 64;
+    // myrel->num_values = 32+14;
+    // myrel->num_values = 32+10;
+    // myrel->num_values = 128;
+
+
+    // myrel->num_values = 66;
 
 
     myrel->values=malloc(sizeof(int64_t)*(myrel->num_values));

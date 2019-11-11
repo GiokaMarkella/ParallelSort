@@ -20,6 +20,8 @@ typedef __m256i vector;
 
 void set_vector(vector* v, int64_t* mem_addr);
 
+void set_vector_incomplete(vector* v, int64_t* mem_addr, int number_of_elements);
+
 void load_vector_consecutive(vector* v, int64_t* mem_addr);
 
 void min_max_compare_vectors(vector v1, vector v2, vector* minv, vector* maxv);
@@ -27,6 +29,8 @@ void min_max_compare_vectors(vector v1, vector v2, vector* minv, vector* maxv);
 void print_vector(vector *v);
 
 void store_vector(relation *rel, int start, vector* v);
+
+void store_vector_incomplete(relation *rel, int start, vector* v, int number_of_elements);
 
 void store_vector_consecutive(int64_t* mem_addr, vector* v);
 
