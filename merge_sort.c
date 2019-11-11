@@ -8,32 +8,62 @@ Purpose				           	:
 
 //TODO fix for smaller arrays
 // and arrays that arent even (+check edge cases)
-void merge_sort(relation *rel, int start, int end){
+void merge_sort(relation *rel, int64_t start, int64_t end){
+  int64_t size = end-start;
+  printf("%ld\n", size%16);
+
+  if(size%16 != 0){
+    printf("not ok\n");
+    end = end - (size%16);
+    merge_sort_internal(rel,start,end);
+    relation_print(rel);
+    return;
+  }
+  else{
+    printf("ok\n");
+    merge_sort_internal(rel,start,end);
+    relation_print(rel);
+    return;
+  }
+}
+
+void sorting_network(vector *a, vector *b, vector *c, vector *d, vector *w, vector *x, vector *y, vector *z){
+  vector e,f,g,h,i,j;
+  min_max_compare_vectors(*a,*b, &e, &f);
+  min_max_compare_vectors(*c,*d, &g, &h);
+
+  min_max_compare_vectors(e,g,w,&i);
+  min_max_compare_vectors(f,h,&j,z);
+  min_max_compare_vectors(j,i,x,y);
+}
+
+void merge_sort_internal(relation *rel, int64_t start, int64_t end){
   if(start<end && (end-start>4*4)){
-    int middle = start + (end-start)/2;
+    int64_t middle = start + (end-start)/2;
     // int middle = start + (end-start)/2;
     // printf("start %d, middle %d, end %d\n", start,middle,end);
-    merge_sort(rel,start,middle);
-    merge_sort(rel,middle,end);
+    merge_sort_internal(rel,start,middle);
+    merge_sort_internal(rel,middle,end);
     merge(rel, start,middle,middle,end);
   }
   else if(end-start<=4*4){
     // printf("start,end : %d %d\n", start,end);
     //sorting network
-    vector a,b,c,d,e,f,g,h,i,j,w,x,y,z;
+    // vector a,b,c,d,e,f,g,h,i,j,w,x,y,z;
+    vector a,b,c,d,w,x,y,z;
     set_vector(&a, &rel->values[start]);
     set_vector(&b, &rel->values[start+1]);
     set_vector(&c, &rel->values[start+2]);
     set_vector(&d, &rel->values[start+3]);
-
-    min_max_compare_vectors(a,b, &e, &f);
-    min_max_compare_vectors(c,d, &g, &h);
-
-
-    min_max_compare_vectors(e,g,&w,&i);
-    min_max_compare_vectors(f,h,&j,&z);
-
-    min_max_compare_vectors(j,i,&x,&y);
+    sorting_network(&a,&b,&c,&d,&w,&x,&y,&z);
+    // min_max_compare_vectors(a,b, &e, &f);
+    // min_max_compare_vectors(c,d, &g, &h);
+    //
+    //
+    // min_max_compare_vectors(e,g,&w,&i);
+    // min_max_compare_vectors(f,h,&j,&z);
+    //
+    // min_max_compare_vectors(j,i,&x,&y);
     //--sorting network
 
     store_vector(rel, start, &w);
@@ -110,17 +140,17 @@ void output_buffer_print(output_buffer *mybuff){
 void output_buffer_emit_vector(output_buffer *mybuff, vector *v){
   store_vector_consecutive(&mybuff->values[mybuff->index], v);
   mybuff->index += 4; //move output index
-  output_buffer_print(mybuff);
+  // output_buffer_print(mybuff);
 }
 
 void output_buffer_emit_value(output_buffer *mybuff, int64_t value){
   mybuff->values[mybuff->index] = value;
   mybuff->index++;
-  output_buffer_print(mybuff);
+  // output_buffer_print(mybuff);
 }
 
 
-void merge(relation *rel, int start1, int end1, int start2, int end2){
+void merge(relation *rel, int64_t start1, int64_t end1, int64_t start2, int64_t end2){
   vector a;
   vector b;
   in in1,in2;
@@ -175,7 +205,7 @@ void merge(relation *rel, int start1, int end1, int start2, int end2){
 
   if(break_flag){ //one of the merging blocks ended
 
-    bitonic_merge_network(&a,&b); //merge last fetched couple
+    bitonic_merge_network(&a,&b); //merge last-fetched couple
     output_buffer_emit_vector(&out, &a);
 
     if(in_eof(&in1)){ //eof1 -> emit in2

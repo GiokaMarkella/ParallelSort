@@ -19,7 +19,9 @@ void relation_init_data(relation* myrel, char* filename, int rel_num){
     printf("rows: %lu, collumns: %lu\n",rows,collumns);
 
     // myrel->num_values = rows;                              //set number of tuples
-    myrel->num_values = 32;
+    // myrel->num_values = 32;
+    myrel->num_values = 66;
+
 
     myrel->values=malloc(sizeof(int64_t)*(myrel->num_values));
     max=0;
